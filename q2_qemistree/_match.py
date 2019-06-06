@@ -65,7 +65,7 @@ def match_tables(collated_fingerprints: pd.DataFrame,
                          'found in the feature table:\n' +
                          ', '.join([str(i) for i in extra_tips]))
     binary_fps = (fps > 0.5).astype(int)
-    filtered_fdata = feature_data.reindex(allfps)
-    filtered_ftable = ftable.reindex(allfps)
+    filtered_fdata = feature_data.loc[allfps].copy()
+    filtered_ftable = ftable.loc[allfps].copy()
 
     return binary_fps, filtered_ftable, filtered_fdata

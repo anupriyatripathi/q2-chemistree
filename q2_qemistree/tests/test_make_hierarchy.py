@@ -143,9 +143,31 @@ class TestDistances(TestCase):
         x = np.array([[1, 0, 1, 0], [1, 0, 1, 0]])
         obs = jaccard_dm(x, np.array([33.2, 33.2]), tolerance=0.1)
 
-        # the m/z are different hence + 0
+        # the m/z are the same hence + 0
         # j = (0 + 0) / (2 + 1) = 0.0
         npt.assert_almost_equal(obs, np.array([0.0]))
+
+    def test_jaccard_dm_multiple_vectors(self):
+        x = np.array([
+            [1, 1, 1, 1, 1],
+            [1, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1],
+        ])
+        y = np.array([33.2, 12, 11, 400, 33.23])
+
+        obs = jaccard_dm(x, y, tolerance=0.2)
+
+        #       | 0,   3/6, 1/6, 4/6, 0/6 |
+        #       | 3/6,   0, 3/6, 2/4, 3/6 |
+        # dm =  | 1/6, 3/6,   0, 4/6, 1/6 |
+        #       | 4/6, 2/4, 4/6,   0, 4/6 |
+        #       | 0/6, 3/6, 1/6, 4/6,   0 |
+        # lower triangle in column-wise order
+        exp = np.array([3/6, 1/6, 4/6, 0/6, 3/6, 2/4, 3/6, 4/6, 1/6, 4/6])
+
+        npt.assert_almost_equal(obs, exp)
 
 
 if __name__ == '__main__':

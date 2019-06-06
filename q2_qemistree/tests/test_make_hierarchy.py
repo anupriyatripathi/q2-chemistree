@@ -159,6 +159,8 @@ class TestDistances(TestCase):
 
         obs = jaccard_dm(x, y, tolerance=0.2)
 
+        # calculated by hand in terms of the Jaccard distance:
+        #
         #       | 0,   3/6, 1/6, 4/6, 0/6 |
         #       | 3/6,   0, 3/6, 2/4, 3/6 |
         # dm =  | 1/6, 3/6,   0, 4/6, 1/6 |

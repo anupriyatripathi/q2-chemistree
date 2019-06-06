@@ -43,9 +43,12 @@ def jaccard_dm(vectors: np.array, attributes: np.array,
     Compute the Jaccard distance between each pair `i` and `j` in `vectors`, if
     the difference between `attributes[i]` and `attibutes[j]` is smaller than
     `tolerance` we add one more `True` element to `vectors[i]` and
-    `vectors[j]`. In order to perform these computations in an efficient way,
-    we first compute a Jaccard distance matrix of the boolean elements in
-    `vectors`. We then use this matrix as a baseline for the rest of our
+    `vectors[j]`.
+
+    In order to perform these computations in an efficient way, we first
+    compute a Jaccard distance matrix of the boolean elements in `vectors`.
+    Then we transform this distance matrix into a similarity matrix
+    (subtracting 1). We then use this matrix as a baseline for the rest of our
     calculation. In order to do this we calculate to additional matrices, one
     with the pairwise unions of `vectors`, and one with the identity of the
     elements in `attributes`. With these two matrices we can then add a small

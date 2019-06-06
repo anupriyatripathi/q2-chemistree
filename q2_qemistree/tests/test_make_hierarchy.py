@@ -9,6 +9,8 @@
 from unittest import TestCase, main
 import os
 import qiime2
+import numpy as np
+import numpy.testing as npt
 from biom.table import Table
 from biom import load_table
 from q2_qemistree import make_hierarchy
@@ -16,6 +18,7 @@ from q2_qemistree import CSIDirFmt
 
 from q2_qemistree._collate_fingerprint import collate_fingerprint
 from q2_qemistree._transformer import _read_dataframe
+from q2_qemistree._hierarchy import jaccard_dm, _pdist_union
 
 
 class TestHierarchy(TestCase):
@@ -97,6 +100,52 @@ class TestHierarchy(TestCase):
             [self.fdata, self.fdata2])
         tip_names = {node.name for node in treeout.tips()}
         self.assertEqual(tip_names, set(merged_fts._observation_ids))
+
+
+class TestDistances(TestCase):
+    def test_pdist_union_identical(self):
+        u = np.array([1, 1, 1, 0, 0, 0])
+        v = np.array([1, 1, 1, 0, 0, 0])
+        self.assertEqual(_pdist_union(u, v), 3.0)
+
+    def test_pdist_union_non_overlapping(self):
+        u = np.array([0, 1, 0, 1, 0])
+        v = np.array([1, 0, 1, 0, 1])
+        self.assertEqual(_pdist_union(u, v), 5.0)
+
+    def test_pdist_union_all_same(self):
+        u = np.array([1, 1, 1, 1, 1])
+        v = np.array([1, 1, 1, 1, 1])
+        self.assertEqual(_pdist_union(u, v), 5.0)
+
+    def test_pdist_union_zero(self):
+        u = np.array([0, 0, 0, 0, 0])
+        v = np.array([0, 0, 0, 0, 0])
+        self.assertEqual(_pdist_union(u, v), 0.0)
+
+    def test_jaccard_dm_two_not_equal(self):
+        x = np.array([[1, 0, 0, 0], [1, 1, 0, 0]])
+        obs = jaccard_dm(x, np.array([33.2, 44.3]), tolerance=0.1)
+
+        # the m/z are different hence + 1
+        # j = (1 + 1) / (2 + 1) = 0.6666666
+        npt.assert_almost_equal(obs, np.array([2.0/3.0]))
+
+    def test_jaccard_dm_two_equal(self):
+        x = np.array([[1, 0, 0, 0], [1, 1, 0, 0]])
+        obs = jaccard_dm(x, np.array([33.2, 33.27]), tolerance=0.1)
+
+        # the m/z are the same hence + 0
+        # j = (1 + 0) / (2 + 1) = 0.3333333
+        npt.assert_almost_equal(obs, np.array([1/3.0]))
+
+    def test_jaccard_dm_two_identical(self):
+        x = np.array([[1, 0, 1, 0], [1, 0, 1, 0]])
+        obs = jaccard_dm(x, np.array([33.2, 33.2]), tolerance=0.1)
+
+        # the m/z are different hence + 0
+        # j = (0 + 0) / (2 + 1) = 0.0
+        npt.assert_almost_equal(obs, np.array([0.0]))
 
 
 if __name__ == '__main__':

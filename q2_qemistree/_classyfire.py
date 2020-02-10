@@ -48,8 +48,13 @@ def get_classyfire_taxonomy(feature_data: pd.DataFrame) -> pd.DataFrame:
     for idx in feature_data.index:
         ms2_smiles = feature_data.loc[idx, 'ms2_smiles']
         csi_smiles = feature_data.loc[idx, 'csi_smiles']
+        if 'ms2_compound' in feature_data.columns:
+            ms2_compound = feature_data.loc[idx, 'ms2_compound']
+        else:
+            ms2_compound = np.nan
         if pd.notna(ms2_smiles) and not ms2_smiles.isspace():
             feature_data.loc[idx, 'smiles'] = ms2_smiles
+        if pd.notna(ms2_compound) or pd.notna(ms2_smiles):
             feature_data.loc[idx, 'annotation_type'] = 'MS2'
         elif pd.notna(csi_smiles):
             feature_data.loc[idx, 'smiles'] = csi_smiles

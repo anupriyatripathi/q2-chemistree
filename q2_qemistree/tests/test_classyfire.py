@@ -54,9 +54,9 @@ class TestClassyfire(TestCase):
     def test_classyfire_output(self):
         classified = get_classyfire_taxonomy(self.smiles)
         classified_mols = classified[classified['kingdom'] != 'unclassified']
-        self.assertTrue(pd.isna(classified_mols).shape, 0)
-        self.assertTrue(classified_mols.loc[1,
-                        'kingdom'] == 'Organic compounds')
+        self.assertTrue(len(classified_mols), 2)
+        self.assertTrue(classified.loc[1,'kingdom'] == 'Organic compounds')
+        self.assertTrue(classified.loc[2, 'annotation_type'] == 'MS2')
         self.assertTrue((self.levels.issubset(set(classified.columns))))
 
 
